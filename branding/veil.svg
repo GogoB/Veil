@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+<title id="title">Veil</title>
+<desc id="desc">A violet speech bubble folds into a pale veil on a midnight-blue rounded square.</desc>
+<defs>
+<linearGradient id="badge" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="512" y2="512"><stop stop-color="#1B2948"/><stop offset="1" stop-color="#080D20"/></linearGradient>
+<linearGradient id="speech" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="512" y2="512"><stop stop-color="#E3CFFF"/><stop offset="1" stop-color="#8B56EF"/></linearGradient>
+<linearGradient id="fold" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="512" y2="512"><stop stop-color="#B894FF"/><stop offset="1" stop-color="#6033CD"/></linearGradient>
+<linearGradient id="hem" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="512" y2="512"><stop stop-color="#F2E5FF"/><stop offset="1" stop-color="#B28BF7"/></linearGradient>
+</defs>
+<path d="M 128 16 L 384 16 C 446 16 496 66 496 128 L 496 384 C 496 446 446 496 384 496 L 128 496 C 66 496 16 446 16 384 L 16 128 C 16 66 66 16 128 16 Z" fill="url(#badge)" stroke="#35415F" stroke-width="1.5"/>
+<path d="M 164 112 L 346 112 C 383 112 410 139 410 176 L 410 274 C 410 313 381 341 343 341 L 257 341 L 184 400 L 184 341 L 164 341 C 126 341 96 313 96 275 L 96 180 C 96 141 125 112 164 112 Z" fill="url(#speech)"/>
+<path d="M 316 112 L 346 112 C 383 112 410 139 410 176 L 410 274 C 410 313 381 341 343 341 L 257 341 L 184 400 Z" fill="url(#fold)"/>
+<path d="M 316 112 L 208 318 L 184 400 Z" fill="url(#hem)"/>
+</svg>
