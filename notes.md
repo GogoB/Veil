@@ -1,7 +1,7 @@
 # Veil - Project Notes
 
 Working name: **Veil**. Final product name and branding remain open.
-Status: product planning and first interactive visual prototype; native app and backend not started.
+Status: product planning and native SwiftUI demo shell; backend not started.
 Started: 2026-09-05.
 
 This file is the continuing project record. Update it after meaningful discussions
@@ -190,27 +190,18 @@ take precedence.
 | 2026-09-07 | Confirmed | Before implementation, use a cyberpunk-inspired visual direction mixed with Apple-like polish; avoid generic AI-generated interface styling and research online references. |
 | 2026-09-07 | Proposed | Graphite and warm-white surfaces, a restrained electric accent, readable native typography, selective glass, and original thread-scoped sigils. See branding/DESIGN_DIRECTION.md for sources and screen ideas. |
 | 2026-09-07 | Proposed | Use High reasoning for most work, Extra High where available for privacy/recovery/E2EE architecture, and Medium for small specified edits. No model or reasoning setting was changed. |
-| 2026-09-07 | Confirmed | User authorized beginning the visual direction after the Astra/High recommendation. Created a local interactive Discover/composer study in design/preview. Palette and screen appearance are ready for review, not yet final. |
+| 2026-09-07 | Confirmed | User authorized implementation after the Astra/High recommendation and clarified that the deliverable must be native SwiftUI. The mistaken browser prototype was removed. |
 
-### Visual prototype milestone — 2026-09-07
+### Native SwiftUI milestone — 2026-09-07
 
-Run `node design/preview/serve.cjs`, then open http://127.0.0.1:4173. Desktop shows
-Discover and Composer together; narrower layouts use a screen selector. Both
-light/dark appearances and acid/cyan accents can be compared. The photo asset is
-local with its source credited in the preview README; no runtime external assets
-or analytics are loaded.
+Open `ios/Veil.xcodeproj` on a Mac with Xcode 15 or later. The iOS 16 application
+uses demo data and covers onboarding, account-mode choice, feeds, topics, post
+detail and replies, the full identity composer, image sanitization, search,
+messages, profiles, Veiled Activity, and privacy/appearance settings.
 
-Verified in an isolated hidden Edge browser: feed/topic switching, likes, replies,
-thread-scoped reply names, public search excluding anonymous aliases, reserved
-alias rejection, sigil-only posts without names, safe text rendering, local post
-creation, Veiled Activity, attachments, and sensitive-media blur. Checked layouts
-at 320px, 390px, 820px and 1440px, with no horizontal overflow at tested narrow
-widths and no page runtime exceptions. Review screenshots are in
-`design/preview/screenshots/`.
-
-This is a browser design study with in-memory demo content. Native SwiftUI,
-backend, real authentication, recovery, encryption, expiration jobs, and Mac-only
-validation remain outstanding. Refer to PROJECT_HANDOFF.md for implementation.
+Static project validation is available on Windows, but SwiftUI compilation and
+rendering require Apple's SDK on the Mac. Backend, real authentication/recovery,
+Matrix encryption, upload transport, and expiration jobs remain outstanding.
 
 ## Workspace and artwork
 

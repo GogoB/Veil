@@ -1,7 +1,7 @@
 # Veil — Complete Project Handoff
 
 Updated: 2026-09-07  
-Status: product and technical planning are complete; the first interactive visual prototype is ready for review; native application implementation has not started.
+Status: product and technical planning are complete; native SwiftUI implementation has started with a demo-data application shell; backend implementation has not started.
 
 Repository: C:\Users\GorjanB\Gorjan\Desktop\Veil  
 Branch: main  
@@ -298,31 +298,33 @@ implementation and design work; Extra High, where available, for privacy
 boundaries, recovery, encrypted messaging, and difficult cross-system debugging.
 Medium is sufficient for small, well-specified visual and copy adjustments.
 
-### Interactive visual prototype (2026-09-07)
+### Native SwiftUI milestone (2026-09-07)
 
-The user authorized starting the visual work after selecting the proposed
-Astra/High workflow. No runtime model setting was changed by the agent.
+The first attempt incorrectly produced a browser prototype. The user corrected
+the scope to SwiftUI. That prototype was removed and replaced with the native
+project at `ios/Veil.xcodeproj`.
 
-`design/preview/` contains an offline-capable HTML/CSS/JavaScript study of
-Discover and the anonymous composer. Run `node design/preview/serve.cjs` and open
-http://127.0.0.1:4173. It has no dependencies and binds only to the local machine.
+The SwiftUI application currently includes:
 
-- Compare dark/light appearances and acid-lime/cyan accents.
-- Try feeds, topics, likes, replies, public search, hiding/muting, identity modes,
-  image attachments, and local demo posting into Discover/Veiled Activity.
-- Inbox is an empty-state composition. All content is local demo state, reset on
-  reload. No account, API, encryption, persistent storage, or expiration service
-  has been implemented.
-- Screenshots are saved in `design/preview/screenshots/`; behaviour, limitations,
-  and the sample photograph's credit are in `design/preview/README.md`.
-- Hidden Edge checks passed for key interactions, anonymous feed/search
-  boundaries, text escaping, image preparation, and 320/390/820px layouts. The
-  desktop composition was reviewed at 1440px. No page runtime errors or third-party
-  network requests were observed.
+- Local Keychain-backed 18+ confirmation and demo account-mode setup.
+- Discover and Following feeds, topics, likes, replies, feed hiding/muting, and
+  post detail.
+- An attributed/anonymous composer with generated/custom/sigil-only presentation,
+  topic, expiration, sensitive-content, and up to four PhotosPicker images.
+- Local image pixel checks and re-encoding before a future upload transport.
+- Public search that excludes anonymous aliases and sigils.
+- Veiled Activity and public-profile separation.
+- Demo message requests/conversations behind a MessagingProvider protocol.
+- Privacy controls plus dark/light/system and acid/cyan appearance choices.
 
-The visual choices remain subject to user review. This browser study does not
-replace the native SwiftUI implementation or prove production privacy properties.
-Figma frames, Mac rendering, Dynamic Type, and VoiceOver still need a later pass.
+The app targets iOS 16 and uses demo data without a backend. Open
+`ios/Veil.xcodeproj` on the Mac in Xcode 15 or later. Windows does not have the
+Apple SDK, so compilation, simulator rendering, Dynamic Type, and VoiceOver still
+require the Mac. This milestone does not prove production privacy, authentication,
+encryption, upload, or expiration behavior.
+
+On Windows, run `powershell -NoProfile -File scripts/Verify-iOSProject.ps1` to
+check Xcode source membership, Info.plist XML, and the local privacy-model guard.
 
 ### Repository areas
 

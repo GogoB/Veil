@@ -25,5 +25,5 @@ desktop.ini
 # Local logs
 *.log
 
-# Temporary local design verification/browser profiles
+# Temporary local verification files
 .tmp/

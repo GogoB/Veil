@@ -1,7 +1,7 @@
 # Veil visual direction
 
-Researched: 2026-09-07. First interactive browser study completed for review;
-native application implementation has not started.
+Researched: 2026-09-07. The first native SwiftUI implementation is ready for its
+Mac build and visual review.
 
 ## Confirmed preference
 
@@ -78,10 +78,10 @@ Build one detailed Discover screen and one composer state with realistic content
 to assess the balance, spacing, identity cues, and accent colour before spreading
 the styling across every screen. Use the existing Figma frames when available.
 
-The first study is now available in [design/preview](../design/preview/README.md).
-It implements the two compositions, dark/light appearance, and acid/cyan accent
-comparison with local demo interactions. The visual direction remains a proposal
-until the user has reviewed it.
+The first native implementation is now available in [ios](../ios/README.md). It
+implements the visual direction in SwiftUI with dark/light/system appearance and
+acid/cyan accent choices. The visual direction remains a proposal until the user
+has reviewed it on an iPhone simulator or device.
 
 ## Reasoning recommendation
 
