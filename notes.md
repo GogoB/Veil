@@ -1,7 +1,7 @@
 # Veil - Project Notes
 
 Working name: **Veil**. Final product name and branding remain open.
-Status: idea and planning; documentation and branding only.
+Status: product planning and first interactive visual prototype; native app and backend not started.
 Started: 2026-09-05.
 
 This file is the continuing project record. Update it after meaningful discussions
@@ -174,6 +174,10 @@ can reveal identity. No promise of zero personal data or universal legal immunit
 
 ## Decision log
 
+The earlier planning sections above are historical. For the consolidated product
+and technical decisions, use PROJECT_HANDOFF.md; later explicit user decisions
+take precedence.
+
 | Date | Status | Decision or discussion |
 | --- | --- | --- |
 | 2026-09-05 | Confirmed | Native iOS with Swift/SwiftUI; develop on Windows and build/test on Mac. |
@@ -183,6 +187,30 @@ can reveal identity. No promise of zero personal data or universal legal immunit
 | 2026-09-05 | Proposed | Extend both-secret checks to device enrollment, recovery changes, and account deletion. |
 | 2026-09-05 | Open | Bot strategy, E2EE implementation, backend, age range, jurisdiction, and launch markets. |
 | 2026-09-05 | Confirmed | Initialize the Desktop workspace and local Git repository under the working name Veil. |
+| 2026-09-07 | Confirmed | Before implementation, use a cyberpunk-inspired visual direction mixed with Apple-like polish; avoid generic AI-generated interface styling and research online references. |
+| 2026-09-07 | Proposed | Graphite and warm-white surfaces, a restrained electric accent, readable native typography, selective glass, and original thread-scoped sigils. See branding/DESIGN_DIRECTION.md for sources and screen ideas. |
+| 2026-09-07 | Proposed | Use High reasoning for most work, Extra High where available for privacy/recovery/E2EE architecture, and Medium for small specified edits. No model or reasoning setting was changed. |
+| 2026-09-07 | Confirmed | User authorized beginning the visual direction after the Astra/High recommendation. Created a local interactive Discover/composer study in design/preview. Palette and screen appearance are ready for review, not yet final. |
+
+### Visual prototype milestone — 2026-09-07
+
+Run `node design/preview/serve.cjs`, then open http://127.0.0.1:4173. Desktop shows
+Discover and Composer together; narrower layouts use a screen selector. Both
+light/dark appearances and acid/cyan accents can be compared. The photo asset is
+local with its source credited in the preview README; no runtime external assets
+or analytics are loaded.
+
+Verified in an isolated hidden Edge browser: feed/topic switching, likes, replies,
+thread-scoped reply names, public search excluding anonymous aliases, reserved
+alias rejection, sigil-only posts without names, safe text rendering, local post
+creation, Veiled Activity, attachments, and sensitive-media blur. Checked layouts
+at 320px, 390px, 820px and 1440px, with no horizontal overflow at tested narrow
+widths and no page runtime exceptions. Review screenshots are in
+`design/preview/screenshots/`.
+
+This is a browser design study with in-memory demo content. Native SwiftUI,
+backend, real authentication, recovery, encryption, expiration jobs, and Mac-only
+validation remain outstanding. Refer to PROJECT_HANDOFF.md for implementation.
 
 ## Workspace and artwork
 

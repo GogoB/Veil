@@ -1,7 +1,8 @@
 # Veil — Complete Project Handoff
 
 Updated: 2026-09-07  
-Status: planning and branding are complete; application implementation has not started.  
+Status: product and technical planning are complete; the first interactive visual prototype is ready for review; native application implementation has not started.
+
 Repository: C:\Users\GorjanB\Gorjan\Desktop\Veil  
 Branch: main  
 Initial commit: 9e6f614
@@ -277,6 +278,51 @@ Do not add polls, communities, group chats, voice calls, video calls, federation
 phone recovery, or cloud deployment in this phase.
 
 ## Technical architecture
+
+### Visual direction update (2026-09-07)
+
+Confirmed by the user before implementation:
+
+- Combine a cyberpunk-inspired aesthetic with an Apple-like look and feel.
+- Avoid the usual generic AI-generated interface appearance.
+- Research visual references before implementing the design.
+
+Proposed interpretation and research are in
+[branding/DESIGN_DIRECTION.md](branding/DESIGN_DIRECTION.md). Palette, typography
+details, visual balance, and individual screen treatments remain proposals until
+reviewed. The existing violet folder icon is provisional and does not dictate the
+app palette. The Figma URL is still outstanding.
+
+Reasoning recommendation, not a changed application setting: High for normal
+implementation and design work; Extra High, where available, for privacy
+boundaries, recovery, encrypted messaging, and difficult cross-system debugging.
+Medium is sufficient for small, well-specified visual and copy adjustments.
+
+### Interactive visual prototype (2026-09-07)
+
+The user authorized starting the visual work after selecting the proposed
+Astra/High workflow. No runtime model setting was changed by the agent.
+
+`design/preview/` contains an offline-capable HTML/CSS/JavaScript study of
+Discover and the anonymous composer. Run `node design/preview/serve.cjs` and open
+http://127.0.0.1:4173. It has no dependencies and binds only to the local machine.
+
+- Compare dark/light appearances and acid-lime/cyan accents.
+- Try feeds, topics, likes, replies, public search, hiding/muting, identity modes,
+  image attachments, and local demo posting into Discover/Veiled Activity.
+- Inbox is an empty-state composition. All content is local demo state, reset on
+  reload. No account, API, encryption, persistent storage, or expiration service
+  has been implemented.
+- Screenshots are saved in `design/preview/screenshots/`; behaviour, limitations,
+  and the sample photograph's credit are in `design/preview/README.md`.
+- Hidden Edge checks passed for key interactions, anonymous feed/search
+  boundaries, text escaping, image preparation, and 320/390/820px layouts. The
+  desktop composition was reviewed at 1440px. No page runtime errors or third-party
+  network requests were observed.
+
+The visual choices remain subject to user review. This browser study does not
+replace the native SwiftUI implementation or prove production privacy properties.
+Figma frames, Mac rendering, Dynamic Type, and VoiceOver still need a later pass.
 
 ### Repository areas
 

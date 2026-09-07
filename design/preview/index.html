@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-accent="acid">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Veil — Discover & compose</title>
+  <link rel="icon" type="image/svg+xml" href="assets/mark.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <symbol id="i-mark" viewBox="0 0 32 32"><path d="M4 5h8l7 22h-8L4 5Zm16 0h8l-8 17-4-11 4-6Z" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m16 8-2.5 5.5L8 16l2.5-5.5L16 8Z"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
+      <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 0 1-8.5 8.5H4l1-4A8.5 8.5 0 1 1 20.5 11.5Z"/></symbol>
+      <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20 5.5c-2.2-2.4-5.6-1.7-8 1-2.4-2.7-5.8-3.4-8-1-3 3.2-.9 6.8 2 9.5l6 5 6-5c2.9-2.7 5-6.3 2-9.5Z"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+      <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="19" cy="12" r="1" fill="currentColor"/></symbol>
+      <symbol id="i-sigil" viewBox="0 0 32 32"><path d="m16 3 11 7v12l-11 7L5 22V10l11-7Zm0 0v26M5 10l22 12M27 10 5 22"/><path d="m10.5 6.5 11 19M21.5 6.5l-11 19" opacity=".45"/></symbol>
+      <symbol id="i-sigil2" viewBox="0 0 32 32"><path d="m16 3 13 13-13 13L3 16 16 3Zm0 6 7 7-7 7-7-7 7-7ZM3 16h26M16 3v26"/></symbol>
+      <symbol id="i-sigil3" viewBox="0 0 32 32"><path d="M8 4h16l4 12-4 12H8L4 16 8 4Zm0 0 16 24M24 4 8 28M4 16h24"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 8a8 8 0 0 0-14-3L3 8m0-5v5h5M4 16a8 8 0 0 0 14 3l3-3m0 5v-5h-5"/></symbol>
+      <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m4 18 5-5 3 3 4-6 5 7"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+      <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+      <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+      <symbol id="i-wave" viewBox="0 0 32 32"><path d="M4 13v6m6-13v20m6-16v12m6-18v24m6-15v6"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 15A9 9 0 0 1 9 4a9 9 0 1 0 11 11Z"/></symbol>
+    </defs>
+  </svg>
+
+  <header class="review-header">
+    <a class="wordmark" href="#" aria-label="Veil design preview"><svg><use href="#i-mark"/></svg><span>veil</span></a>
+    <span class="review-tag">INTERFACE STUDY <span class="slash">/</span> 01</span>
+    <div class="review-controls">
+      <div class="accent-controls" role="group" aria-label="Accent colour">
+        <button class="swatch acid" data-accent="acid" aria-label="Acid accent" aria-pressed="true"></button>
+        <button class="swatch cyan" data-accent="cyan" aria-label="Cyan accent" aria-pressed="false"></button>
+      </div>
+      <span class="control-divider"></span>
+      <button id="theme-toggle" class="theme-button" aria-label="Switch to light appearance"><svg class="icon"><use href="#i-sun"/></svg><span>Light</span></button>
+    </div>
+  </header>
+
+  <main class="study">
+    <aside class="study-intro">
+      <p class="eyebrow">A SOCIAL SPACE, RECONSIDERED</p>
+      <h1>A space<br>of your<br><em>own.</em></h1>
+      <p class="intro-copy">A familiar feeling.<br>A little less exposed.</p>
+      <div class="study-notes">
+        <div><span class="note-index">01</span><p><strong>Room to read.</strong><br>Quiet surfaces. Clear type.<br>The conversation comes first.</p></div>
+        <div><span class="note-index">02</span><p><strong>An identity in the moment.</strong><br>A different sigil for every thread.<br>Recognition, on your terms.</p></div>
+        <div><span class="note-index">03</span><p><strong>Your name. Your choice.</strong><br>See exactly how you’ll appear<br>before you share a thought.</p></div>
+      </div>
+      <div class="palette"><i></i><i></i><i></i><span>GRAPHITE / BONE / <b id="palette-name">ACID</b></span></div>
+    </aside>
+
+    <div class="mobile-screen-tabs" role="group" aria-label="Preview screen">
+      <button data-screen="discover" aria-pressed="true">Discover</button>
+      <button data-screen="composer" aria-pressed="false">Composer</button>
+    </div>
+
+    <section class="screen-study" id="discover-study" aria-label="Discover screen preview">
+      <div class="screen-caption"><span>01 <span class="slash">/</span> DISCOVER</span><span>THE OPEN CONVERSATION</span></div>
+      <div class="phone" id="discover-phone">
+        <div class="status-bar" aria-hidden="true"><span>9:41</span><i class="dynamic-island"></i><span class="status-symbols"><b class="signal">▂▄▆█</b><span class="wifi">◔</span><i class="battery"></i></span></div>
+        <header class="app-header"><span class="app-wordmark"><svg><use href="#i-mark"/></svg>veil</span><button class="icon-button" id="feed-settings" aria-label="Feed preferences"><svg class="icon sliders" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.5"/><circle cx="15" cy="17" r="2.5"/></svg></button></header>
+        <div class="feed-tabs" role="tablist" aria-label="Feed">
+          <button role="tab" id="tab-discover" aria-selected="true" aria-controls="feed" data-feed="discover">Discover<span></span></button>
+          <button role="tab" id="tab-following" aria-selected="false" aria-controls="feed" data-feed="following">Following</button>
+          <span class="feed-mark" aria-hidden="true">↗</span>
+        </div>
+        <div class="topic-list" role="group" aria-label="Filter by topic">
+          <button data-topic="All" aria-pressed="true">For you</button>
+          <button data-topic="After hours" aria-pressed="false">After hours</button>
+          <button data-topic="Architecture" aria-pressed="false">Architecture</button>
+          <button data-topic="Music" aria-pressed="false">Music</button>
+        </div>
+        <div class="feed" id="feed" role="tabpanel" aria-labelledby="tab-discover" tabindex="0"></div>
+        <nav class="tab-bar" aria-label="Main navigation">
+          <button class="nav-item active" id="nav-discover" aria-label="Discover" aria-current="page"><svg class="icon"><use href="#i-compass"/></svg><span>Discover</span></button>
+          <button class="nav-item" id="nav-search" aria-label="Search"><svg class="icon"><use href="#i-search"/></svg><span>Search</span></button>
+          <button class="compose-button" id="open-compose" aria-label="Create a post"><svg class="icon"><use href="#i-plus"/></svg></button>
+          <button class="nav-item" id="nav-inbox" aria-label="Inbox"><svg class="icon"><use href="#i-chat"/></svg><span>Inbox</span></button>
+          <button class="nav-item" id="nav-activity" aria-label="Veiled Activity"><svg class="icon"><use href="#i-sigil"/></svg><span>Veiled</span></button>
+        </nav>
+        <div class="home-indicator" aria-hidden="true"></div>
+        <div class="sheet-backdrop" id="sheet-backdrop" hidden></div>
+        <section class="sheet" id="detail-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+          <div class="sheet-handle" aria-hidden="true"></div>
+          <header><h2 id="sheet-title"></h2><button id="close-sheet" class="icon-button" aria-label="Close panel"><svg class="icon"><use href="#i-close"/></svg></button></header>
+          <div id="sheet-content" class="sheet-content"></div>
+        </section>
+      </div>
+      <p class="screen-footnote"><span class="tiny-cross">+</span> Follow a topic. Find a thought. Leave a little room for chance.</p>
+    </section>
+
+    <section class="screen-study" id="composer-study" aria-label="Composer screen preview">
+      <div class="screen-caption"><span>02 <span class="slash">/</span> COMPOSE</span><span>ON YOUR TERMS</span></div>
+      <div class="phone composer-phone" id="composer-phone">
+        <div class="status-bar" aria-hidden="true"><span>9:41</span><i class="dynamic-island"></i><span class="status-symbols"><b class="signal">▂▄▆█</b><span class="wifi">◔</span><i class="battery"></i></span></div>
+        <header class="composer-header"><button id="clear-draft" class="text-button">Clear</button><span>New post</span><button class="publish-button" id="publish">Post<svg class="icon"><use href="#i-arrow"/></svg></button></header>
+        <div class="composer-scroll">
+          <div class="identity-heading"><div><span class="eyebrow" id="identity-eyebrow">YOUR VOICE. YOUR CHOICE.</span><h2 id="identity-title">Behind<br>the veil.</h2></div><div class="large-sigil" id="large-sigil"><svg><use href="#i-sigil"/></svg><span class="corner a"></span><span class="corner b"></span></div></div>
+          <div class="identity-toggle" role="group" aria-label="Post identity">
+            <button data-identity="profile" aria-pressed="false"><svg class="icon"><use href="#i-person"/></svg>Profile</button>
+            <button data-identity="anonymous" aria-pressed="true"><svg class="icon"><use href="#i-sigil"/></svg>Anonymous</button>
+          </div>
+          <div id="anonymous-options">
+            <div class="alias-modes" role="group" aria-label="Anonymous presentation">
+              <button data-mode="generated" aria-pressed="true">Generated alias</button><button data-mode="custom" aria-pressed="false">Custom</button><button data-mode="sigil" aria-pressed="false">Sigil only</button>
+            </div>
+            <div class="alias-row"><svg class="icon" id="alias-icon"><use href="#i-sigil"/></svg><div><span class="alias-description" id="alias-description">IN THIS THREAD, YOU’RE</span><strong id="alias-name">quiet frequency</strong><input id="custom-alias" aria-label="Custom thread alias" maxlength="24" placeholder="Choose a thread alias" hidden></div><button id="regenerate-alias" class="icon-button" aria-label="Generate a new alias and sigil"><svg class="icon"><use href="#i-refresh"/></svg></button></div>
+          </div>
+          <div class="profile-identity" id="profile-identity" hidden><span class="avatar profile-avatar">n.</span><div><strong>noor</strong><span>Posts appear on your public profile.</span></div></div>
+          <div class="writing-area"><label for="post-text" class="visually-hidden">Post text</label><textarea id="post-text" placeholder="What’s on your mind?" maxlength="2000" spellcheck="false">I walked the long way home just to finish an album. No regrets.</textarea><span class="character-count" id="character-count">72 / 2,000</span></div>
+          <div id="image-previews" class="image-previews"></div>
+          <div class="composer-tools"><label class="attachment-button" for="image-input" tabindex="0" role="button" aria-label="Attach up to four images"><svg class="icon"><use href="#i-image"/></svg><span>Add images</span></label><input type="file" id="image-input" accept="image/jpeg,image/png,image/webp" multiple hidden><label class="topic-select"><span class="topic-hash">#</span><select id="composer-topic" aria-label="Post topic"><option>After hours</option><option>Architecture</option><option>Music</option><option value="">No topic</option></select></label></div>
+          <div class="post-options">
+            <label class="option-row"><span><svg class="icon"><use href="#i-clock"/></svg>Disappears after</span><select id="expiry" aria-label="Post expiration"><option value="24 hours">24 hours</option><option value="7 days">7 days</option><option value="30 days">30 days</option><option value="Never">Never</option></select></label>
+            <div class="option-row"><span><svg class="icon"><use href="#i-eye"/></svg>Sensitive content</span><button id="sensitive-toggle" class="switch" role="switch" aria-checked="false" aria-label="Sensitive content"><span></span></button></div>
+          </div>
+          <p class="identity-note" id="identity-note"><span class="note-dot"></span><span>A name for this thread only.<br>Your profile stays out of the conversation.</span></p>
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+        </div>
+        <div class="composer-bottom"><svg class="icon"><use href="#i-sigil"/></svg><span id="posting-as">Posting as <strong>quiet frequency</strong></span><svg class="icon small-check"><use href="#i-check"/></svg></div>
+        <div class="home-indicator" aria-hidden="true"></div>
+      </div>
+      <p class="screen-footnote"><span class="tiny-cross">+</span> The identity is temporary. The choice is always yours.</p>
+    </section>
+  </main>
+
+  <footer class="review-footer"><span><i></i> INTERACTIVE CONCEPT <span class="slash">/</span> LOCAL DEMO DATA</span><p>Try the controls. Demo posts stay in this tab and reset on reload.</p><a href="README.md">Preview notes ↗</a></footer>
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>
