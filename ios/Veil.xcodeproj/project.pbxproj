@@ -23,6 +23,12 @@
 		A0000000000000000000010E /* ProfileAndSettingsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000E /* ProfileAndSettingsViews.swift */; };
 		A0000000000000000000010F /* ImageSanitizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000000F /* ImageSanitizer.swift */; };
 		A00000000000000000000110 /* MessagingProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000010 /* MessagingProvider.swift */; };
+		A00000000000000000000111 /* ContractMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000013 /* ContractMapping.swift */; };
+		A00000000000000000000112 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000014 /* APIClient.swift */; };
+		A00000000000000000000113 /* DeviceCredentialStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000015 /* DeviceCredentialStore.swift */; };
+		A00000000000000000000114 /* MatrixMessagingProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000016 /* MatrixMessagingProvider.swift */; };
+		A00000000000000000000115 /* VeilShared in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000600 /* VeilShared */; };
+		A00000000000000000000116 /* MatrixRustSDK in Frameworks */ = {isa = PBXBuildFile; productRef = A00000000000000000000601 /* MatrixRustSDK */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +50,10 @@
 		A00000000000000000000010 /* MessagingProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingProvider.swift; sourceTree = "<group>"; };
 		A00000000000000000000011 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A00000000000000000000012 /* Veil.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Veil.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000013 /* ContractMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContractMapping.swift; sourceTree = "<group>"; };
+		A00000000000000000000014 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		A00000000000000000000015 /* DeviceCredentialStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCredentialStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000016 /* MatrixMessagingProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixMessagingProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +61,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A00000000000000000000115 /* VeilShared in Frameworks */,
+				A00000000000000000000116 /* MatrixRustSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,7 +94,10 @@
 		};
 		A00000000000000000000302 /* Models */ = {
 			isa = PBXGroup;
-			children = (A00000000000000000000002 /* Models.swift */);
+			children = (
+				A00000000000000000000002 /* Models.swift */,
+				A00000000000000000000013 /* ContractMapping.swift */,
+			);
 			path = Models;
 			sourceTree = "<group>";
 		};
@@ -129,6 +144,9 @@
 			children = (
 				A0000000000000000000000F /* ImageSanitizer.swift */,
 				A00000000000000000000010 /* MessagingProvider.swift */,
+				A00000000000000000000014 /* APIClient.swift */,
+				A00000000000000000000015 /* DeviceCredentialStore.swift */,
+				A00000000000000000000016 /* MatrixMessagingProvider.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -159,6 +177,10 @@
 			buildRules = ();
 			dependencies = ();
 			name = Veil;
+			packageProductDependencies = (
+				A00000000000000000000600 /* VeilShared */,
+				A00000000000000000000601 /* MatrixRustSDK */,
+			);
 			productName = Veil;
 			productReference = A00000000000000000000012 /* Veil.app */;
 			productType = "com.apple.product-type.application";
@@ -182,6 +204,10 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (en, Base);
 			mainGroup = A00000000000000000000300;
+			packageReferences = (
+				A00000000000000000000700 /* XCLocalSwiftPackageReference "../Shared" */,
+				A00000000000000000000701 /* XCRemoteSwiftPackageReference "matrix-rust-components-swift" */,
+			);
 			productRefGroup = A00000000000000000000308 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -219,10 +245,45 @@
 				A0000000000000000000010E /* ProfileAndSettingsViews.swift in Sources */,
 				A0000000000000000000010F /* ImageSanitizer.swift in Sources */,
 				A00000000000000000000110 /* MessagingProvider.swift in Sources */,
+				A00000000000000000000111 /* ContractMapping.swift in Sources */,
+				A00000000000000000000112 /* APIClient.swift in Sources */,
+				A00000000000000000000113 /* DeviceCredentialStore.swift in Sources */,
+				A00000000000000000000114 /* MatrixMessagingProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A00000000000000000000700 /* XCLocalSwiftPackageReference "../Shared" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Shared;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A00000000000000000000701 /* XCRemoteSwiftPackageReference "matrix-rust-components-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/matrix-org/matrix-rust-components-swift.git";
+			requirement = {
+				kind = exactVersion;
+				version = 26.08.11;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A00000000000000000000600 /* VeilShared */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000700 /* XCLocalSwiftPackageReference "../Shared" */;
+			productName = VeilShared;
+		};
+		A00000000000000000000601 /* MatrixRustSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A00000000000000000000701 /* XCRemoteSwiftPackageReference "matrix-rust-components-swift" */;
+			productName = MatrixRustSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A00000000000000000000400 /* Debug */ = {

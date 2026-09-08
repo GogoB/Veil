@@ -1,42 +1,44 @@
-# Veil iOS proof of concept
+# Veil native iOS app
 
-This is the native SwiftUI implementation. Open `Veil.xcodeproj` on a Mac with
-Xcode 15 or later, choose an iOS 16+ simulator, and run the `Veil` scheme.
+Veil is implemented as a native SwiftUI application in `Veil.xcodeproj`. It
+targets iOS 16, links the local `Shared` contracts package, and pins
+`MatrixRustSDK` to exact version `26.08.11` behind `MessagingProvider`.
 
-For a command-line simulator build on the Mac:
+Open the project on a Mac with Xcode, select the `Veil` scheme, and run an iOS
+16+ simulator or device. The app offers two startup paths:
 
-    xcodebuild -project ios/Veil.xcodeproj -scheme Veil \
-      -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+- **Local server** creates or recovers a real local account and connects to the
+  Vapor API, PostgreSQL, and private Synapse services.
+- **Demo data** opens the full native interface without a running backend.
 
-On Windows, validate the project structure from the repository root with:
+The app includes the Keychain-only adult confirmation, device-only and
+recoverable accounts, Discover and Following, attributed and anonymous posts,
+sanitized image uploads, topics, expiration, collaborators, reposts and quotes,
+comments, likes, public profiles, follow actions, search, Veiled Activity,
+privacy controls, encrypted message requests, text and image messages,
+delete-for-all, selected-message reports, timers, and message-key transfer.
 
-    powershell -NoProfile -File scripts/Verify-iOSProject.ps1
+Start the local services and run the API smoke test from the repository root:
 
-No package installation, backend, or network connection is required. The app runs
-with local demo data. The first launch presents the local 18+ confirmation and
-account-mode setup. Choose a three-character-or-longer demo username; recoverable
-mode additionally asks for a 12-character passphrase but does not store it.
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Start-Local.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Smoke-Test-API.ps1
+```
 
-Implemented in this milestone:
+For an iPhone or a Mac on another machine, initialize with the Windows host LAN
+address and set the same API address in the app's Privacy Controls:
 
-- Keychain-only adult confirmation, never represented in an API model.
-- Device-only/recoverable account-mode demonstration.
-- Discover and Following feeds; anonymous posts cannot enter Following.
-- Topics, likes, thread replies, hiding, and topic muting.
-- Anonymous/profile composer with generated alias, validated custom alias, or
-  sigil-only presentation.
-- Four-image picker, local pixel limits, and JPEG re-encoding to discard source
-  image metadata before a future upload.
-- Expiration and sensitive-content choices with a blurred-media reveal.
-- Public search that deliberately excludes anonymous aliases and sigils.
-- Veiled Activity and public profile separation.
-- Demo message requests and conversations behind `MessagingProvider`.
-- Appearance, accent, content, and messaging preferences.
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Start-Local.ps1 -PublicHost 192.168.1.50
+```
 
-The Matrix adapter, Vapor API, persistence beyond a few local preferences, real
-account credentials, collaborator invitations, upload transport, expiration jobs,
-and server-enforced blocks are not implemented yet. Windows cannot compile
-SwiftUI; the first build and visual/accessibility check must be run on the Mac.
+Validate source membership and privacy guards on Windows with:
 
-The provisional bundle identifier is `com.veil.poc`. Select your development team
-in Xcode only when running on a physical device.
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Verify-iOSProject.ps1
+```
+
+Windows can parse the Swift source through the Linux toolchain, but it cannot
+compile SwiftUI or the Apple-only Matrix XCFramework. Run the final build,
+simulator, Dynamic Type, and VoiceOver checks in Xcode. See the repository
+`README.md` for full local-stack instructions.

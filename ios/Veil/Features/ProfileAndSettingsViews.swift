@@ -1,4 +1,5 @@
 import SwiftUI
+import VeilShared
 
 struct VeiledActivityView: View {
     @EnvironmentObject private var store: DemoSocialStore
@@ -9,6 +10,34 @@ struct VeiledActivityView: View {
         NavigationStack {
             ScrollView {
                 LazyVStack(spacing: 0) {
+                    if !store.collaborationInvitations.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            VeilSectionLabel(text: "Collaboration invitations")
+                            ForEach(store.collaborationInvitations) { invitation in
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("@\(invitation.creator.username) invited you")
+                                        .font(.headline)
+                                    Text(invitation.excerpt)
+                                        .font(.subheadline)
+                                        .foregroundStyle(Color.veilSecondary)
+                                        .lineLimit(3)
+                                    if invitation.visibility == .anonymous {
+                                        Label("Owners and owner count stay hidden", systemImage: "eye.slash")
+                                            .font(.caption)
+                                            .foregroundStyle(Color.veilSecondary)
+                                    }
+                                    Button("Accept and publish") {
+                                        Task { await store.acceptCollaboration(invitation) }
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                }
+                                .padding(14)
+                                .background(Color.veilRaised, in: RoundedRectangle(cornerRadius: 12))
+                            }
+                        }
+                        .padding(20)
+                        VeilDivider()
+                    }
                     VStack(alignment: .leading, spacing: 14) {
                         VeilSectionLabel(text: "Private to this app")
                         HStack {
@@ -58,9 +87,13 @@ struct PublicProfileView: View {
     @EnvironmentObject private var appFlow: AppFlowStore
     @EnvironmentObject private var store: DemoSocialStore
     @EnvironmentObject private var appearance: AppearanceStore
+    @State private var editsBio = false
+    @State private var bioDraft = ""
 
     private var attributedPosts: [DemoPost] {
-        store.posts.filter { $0.isMine && !$0.actor.isAnonymous }
+        store.currentProfile == nil
+            ? store.posts.filter { $0.isMine && !$0.actor.isAnonymous }
+            : store.currentProfilePosts
     }
 
     var body: some View {
@@ -73,16 +106,23 @@ struct PublicProfileView: View {
                         NavigationLink("Settings") { PrivacySettingsView() }
                             .buttonStyle(.bordered)
                     }
-                    Text(appFlow.username).font(.title.bold())
-                    Text("Looking for quieter corners of the city.")
+                    Text(store.currentProfile?.username ?? appFlow.username).font(.title.bold())
+                    Text(store.currentProfile?.bio ?? "Looking for quieter corners of the city.")
                         .font(.body)
                         .foregroundStyle(Color.veilSecondary)
                     HStack(spacing: 24) {
-                        Label("128 followers", systemImage: "person.2")
-                        Label("94 following", systemImage: "arrow.triangle.2.circlepath")
+                        Label("\(store.currentProfile?.followerCount ?? 128) followers", systemImage: "person.2")
+                        Label("\(store.currentProfile?.followingCount ?? 94) following", systemImage: "arrow.triangle.2.circlepath")
                     }
                     .font(.caption)
                     .foregroundStyle(Color.veilSecondary)
+                    if store.currentProfile != nil {
+                        Button("Edit bio") {
+                            bioDraft = store.currentProfile?.bio ?? ""
+                            editsBio = true
+                        }
+                        .buttonStyle(.bordered)
+                    }
                 }
                 .padding(20)
                 VeilDivider()
@@ -92,16 +132,44 @@ struct PublicProfileView: View {
         .background(Color.veilBackground)
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $editsBio) {
+            NavigationStack {
+                Form {
+                    TextEditor(text: $bioDraft)
+                        .frame(minHeight: 150)
+                    Text("\(bioDraft.count)/300")
+                        .font(.caption)
+                        .foregroundStyle(bioDraft.count > 300 ? Color.red : Color.veilSecondary)
+                }
+                .navigationTitle("Edit bio")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) { Button("Cancel") { editsBio = false } }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Save") {
+                            Task {
+                                await store.updateBio(bioDraft)
+                                editsBio = false
+                            }
+                        }
+                        .disabled(bioDraft.count > 300)
+                    }
+                }
+            }
+        }
     }
 }
 
 struct PrivacySettingsView: View {
     @EnvironmentObject private var appFlow: AppFlowStore
     @EnvironmentObject private var appearance: AppearanceStore
+    @EnvironmentObject private var store: DemoSocialStore
     @AppStorage("veil.preference.blurSensitive") private var blursSensitiveMedia = true
     @AppStorage("veil.preference.readReceipts") private var readReceipts = false
     @AppStorage("veil.preference.typing") private var typingIndicators = false
     @AppStorage("veil.preference.anonymousRequests") private var requestPolicy = AnonymousRequestPolicy.filtered.rawValue
+    @AppStorage("veil.api.base-url") private var apiBaseURL = "http://127.0.0.1:8080"
+    @AppStorage("veil.preference.mutedKeywords") private var mutedKeywordsStorage = ""
     @State private var keyword = ""
     @State private var mutedKeywords: [String] = []
     @State private var showsResetConfirmation = false
@@ -135,6 +203,16 @@ struct PrivacySettingsView: View {
                 .onDelete { mutedKeywords.remove(atOffsets: $0) }
             }
 
+            Section("Local server") {
+                TextField("API address", text: $apiBaseURL)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .keyboardType(.URL)
+                Text("Use your Windows host LAN address on a physical iPhone. Restart Veil after changing it.")
+                    .font(.caption)
+                    .foregroundStyle(Color.veilSecondary)
+            }
+
             Section("Messages") {
                 Picker("Anonymous requests", selection: $requestPolicy) {
                     ForEach(AnonymousRequestPolicy.allCases) { policy in
@@ -151,11 +229,12 @@ struct PrivacySettingsView: View {
             Section("Account") {
                 LabeledContent("Mode", value: appFlow.accountMode.title)
                 NavigationLink("Recovery and device access") { RecoveryExplanationView() }
-                Button("Reset local demo account", role: .destructive) { showsResetConfirmation = true }
+                NavigationLink("Transfer encrypted message history") { MessageKeyTransferView() }
+                Button("Sign out on this device", role: .destructive) { showsResetConfirmation = true }
             }
 
             Section {
-                Text("Demo preferences stay on this device. The adult confirmation remains in Keychain and is never included in API models.")
+                Text("The adult confirmation remains in Keychain and is never included in API models.")
                     .font(.caption)
                     .foregroundStyle(Color.veilSecondary)
             }
@@ -163,11 +242,86 @@ struct PrivacySettingsView: View {
         .scrollContentBackground(.hidden)
         .background(Color.veilBackground)
         .navigationTitle("Privacy controls")
-        .confirmationDialog("Reset the local demo account?", isPresented: $showsResetConfirmation, titleVisibility: .visible) {
-            Button("Reset local demo", role: .destructive) { appFlow.resetLocalDemoAccount() }
+        .onAppear {
+            mutedKeywords = mutedKeywordsStorage.split(separator: "\n").map(String.init)
+        }
+        .onChange(of: mutedKeywords) { values in
+            mutedKeywordsStorage = values.joined(separator: "\n")
+        }
+        .onDisappear {
+            guard let policy = VeilShared.AnonymousRequestPolicy(rawValue: requestPolicy) else { return }
+            Task {
+                await store.savePreferences(
+                    mutedKeywords: Set(mutedKeywords),
+                    blurSensitiveMedia: blursSensitiveMedia,
+                    anonymousRequestPolicy: policy
+                )
+            }
+        }
+        .confirmationDialog("Sign out on this device?", isPresented: $showsResetConfirmation, titleVisibility: .visible) {
+            Button("Sign out", role: .destructive) { Task { await appFlow.signOut() } }
             Button("Cancel", role: .cancel) { }
         } message: {
-            Text("This removes the locally saved demo username and account mode. It does not delete the Keychain adult confirmation.")
+            Text("Device-only accounts cannot be recovered after the last enrolled device is lost. The local adult confirmation stays in Keychain.")
         }
+    }
+}
+
+private struct MessageKeyTransferView: View {
+    @EnvironmentObject private var messagingStore: MessagingStore
+    @State private var exportedKey: String?
+    @State private var importedKey = ""
+    @State private var status: String?
+    @State private var isWorking = false
+
+    var body: some View {
+        Form {
+            Section("From this device") {
+                Text("Export only while you still have an old device that can decrypt your history.")
+                    .font(.caption)
+                    .foregroundStyle(Color.veilSecondary)
+                Button(isWorking ? "Preparing…" : "Prepare transfer key") {
+                    isWorking = true
+                    Task {
+                        do {
+                            exportedKey = try await messagingStore.exportMessageRecoveryKey()
+                            status = "Transfer key ready. Keep it private."
+                        } catch { status = error.localizedDescription }
+                        isWorking = false
+                    }
+                }
+                .disabled(isWorking)
+                if let exportedKey {
+                    Text(exportedKey)
+                        .font(.system(.caption, design: .monospaced))
+                        .textSelection(.enabled)
+                    ShareLink(item: exportedKey) {
+                        Label("Export securely", systemImage: "square.and.arrow.up")
+                    }
+                }
+            }
+            Section("On the replacement device") {
+                SecureField("Transfer key", text: $importedKey)
+                Button("Import message history key") {
+                    isWorking = true
+                    Task {
+                        do {
+                            try await messagingStore.importMessageRecoveryKey(importedKey)
+                            importedKey = ""
+                            status = "Encrypted history key imported."
+                        } catch { status = error.localizedDescription }
+                        isWorking = false
+                    }
+                }
+                .disabled(importedKey.isEmpty || isWorking)
+            }
+            if let status { Section { Text(status) } }
+            Section {
+                Text("Social-account recovery alone cannot decrypt old messages. This transfer key is separate from the Veil recovery code.")
+                    .font(.caption)
+                    .foregroundStyle(Color.veilSecondary)
+            }
+        }
+        .navigationTitle("Message history")
     }
 }

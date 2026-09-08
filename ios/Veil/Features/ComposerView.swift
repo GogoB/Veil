@@ -1,6 +1,7 @@
 import PhotosUI
 import SwiftUI
 import UIKit
+import VeilShared
 
 struct ComposerView: View {
     @Environment(\.dismiss) private var dismiss
@@ -19,7 +20,10 @@ struct ComposerView: View {
     @State private var isSensitive = false
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var images: [Data] = []
+    @State private var collaboratorQuery = ""
+    @State private var collaborators: [VeilShared.Profile] = []
     @State private var isProcessingImages = false
+    @State private var isPublishing = false
     @State private var errorMessage: String?
     @FocusState private var focusedField: Field?
 
@@ -30,6 +34,7 @@ struct ComposerView: View {
         (!bodyText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty)
             && bodyText.count <= 2_000
             && !isProcessingImages
+            && !isPublishing
     }
 
     private var activeName: String {
@@ -62,6 +67,7 @@ struct ComposerView: View {
                     writingArea
                     imagePreviews
                     composerTools
+                    collaboratorPicker
                     VeilDivider()
                     options
                     VeilDivider()
@@ -100,7 +106,7 @@ struct ComposerView: View {
                     Button {
                         publish()
                     } label: {
-                        Label("Post", systemImage: "arrow.up.right")
+                        Label(isPublishing ? "Posting…" : "Post", systemImage: "arrow.up.right")
                             .fontWeight(.semibold)
                     }
                     .disabled(!canPost)
@@ -357,6 +363,45 @@ struct ComposerView: View {
         }
     }
 
+    private var collaboratorPicker: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Invite collaborators", systemImage: "person.2.badge.plus")
+                .font(.subheadline)
+            Text("The post publishes after everyone accepts. Anonymous posts never reveal owners or owner count.")
+                .font(.caption)
+                .foregroundStyle(Color.veilSecondary)
+            TextField("Search public profiles", text: $collaboratorQuery)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .padding(12)
+                .background(Color.veilRaised, in: RoundedRectangle(cornerRadius: 10))
+                .task(id: collaboratorQuery) {
+                    try? await Task.sleep(nanoseconds: 250_000_000)
+                    guard !Task.isCancelled else { return }
+                    await store.performSearch(collaboratorQuery)
+                }
+            ForEach(store.searchProfiles.prefix(5)) { profile in
+                let selected = collaborators.contains { $0.id == profile.id }
+                Button {
+                    if selected {
+                        collaborators.removeAll { $0.id == profile.id }
+                    } else if collaborators.count < 5 {
+                        collaborators.append(profile)
+                    }
+                } label: {
+                    HStack {
+                        Text("@\(profile.username)")
+                        Spacer()
+                        Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                    }
+                    .font(.subheadline)
+                    .frame(minHeight: 38)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
     private func rotateIdentity() {
         let current = aliases.firstIndex(of: generatedAlias) ?? 0
         generatedAlias = aliases[(current + 1) % aliases.count]
@@ -384,23 +429,29 @@ struct ComposerView: View {
     }
 
     private func publish() {
-        do {
-            try store.createPost(
-                body: bodyText,
-                identity: identity,
-                anonymousMode: anonymousMode,
-                generatedAlias: generatedAlias,
-                customAlias: customAlias,
-                sigilSeed: sigilSeed,
-                profileHandle: appFlow.username,
-                topic: topic,
-                expiration: expiration,
-                isSensitive: isSensitive,
-                images: images
-            )
-            dismiss()
-        } catch {
-            errorMessage = error.localizedDescription
+        isPublishing = true
+        errorMessage = nil
+        Task {
+            do {
+                try await store.createPost(
+                    body: bodyText,
+                    identity: identity,
+                    anonymousMode: anonymousMode,
+                    generatedAlias: generatedAlias,
+                    customAlias: customAlias,
+                    sigilSeed: sigilSeed,
+                    profileHandle: appFlow.username,
+                    topic: topic,
+                    expiration: expiration,
+                    isSensitive: isSensitive,
+                    images: images,
+                    collaboratorProfileIDs: collaborators.map(\.id)
+                )
+                dismiss()
+            } catch {
+                errorMessage = error.localizedDescription
+                isPublishing = false
+            }
         }
     }
 }

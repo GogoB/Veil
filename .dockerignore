@@ -1,0 +1,10 @@
+.git
+.build
+**/.build
+**/.swiftpm
+**/DerivedData
+.local
+.env
+*.log
+ios
+branding

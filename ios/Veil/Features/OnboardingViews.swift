@@ -54,6 +54,8 @@ struct AccountSetupView: View {
     @State private var mode: AccountMode = .deviceOnly
     @State private var passphrase = ""
     @State private var showsDetails = false
+    @State private var showsRecovery = false
+    @State private var usesLocalServer = true
 
     private var canContinue: Bool {
         let handle = username.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -82,6 +84,13 @@ struct AccountSetupView: View {
                             .background(Color.veilRaised, in: RoundedRectangle(cornerRadius: 12))
                             .accessibilityHint("Three to twenty-four letters, numbers, underscores, or dots")
                     }
+
+                    Picker("Data source", selection: $usesLocalServer) {
+                        Text("Local server").tag(true)
+                        Text("Demo data").tag(false)
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityHint("The local server creates a real proof-of-concept account. Demo data stays on this device.")
 
                     VStack(spacing: 10) {
                         ForEach(AccountMode.allCases) { option in
@@ -119,7 +128,7 @@ struct AccountSetupView: View {
                                 .textContentType(.newPassword)
                                 .padding(15)
                                 .background(Color.veilRaised, in: RoundedRectangle(cornerRadius: 12))
-                            Text("The proof of concept does not store this passphrase. A real account will also generate a separate recovery code.")
+                            Text("The passphrase is sent only to your local Veil API over the configured connection and is stored there as a password verifier. It is never saved on this device.")
                                 .font(.caption)
                                 .foregroundStyle(Color.veilSecondary)
                         }
@@ -133,11 +142,30 @@ struct AccountSetupView: View {
                     }
                     .foregroundStyle(appearance.accentColor)
 
+                    if usesLocalServer {
+                        Button {
+                            showsRecovery = true
+                        } label: {
+                            Label("Recover an existing account", systemImage: "arrow.clockwise")
+                        }
+                        .foregroundStyle(Color.veilSecondary)
+                    }
+
                     Button {
-                        appFlow.createLocalDemoAccount(username: username, mode: mode)
+                        if usesLocalServer {
+                            Task {
+                                await appFlow.createAccount(
+                                    username: username,
+                                    mode: mode,
+                                    passphrase: mode == .recoverable ? passphrase : nil
+                                )
+                            }
+                        } else {
+                            appFlow.createLocalDemoAccount(username: username, mode: mode)
+                        }
                     } label: {
                         HStack {
-                            Text("Enter Veil")
+                            Text(appFlow.isWorking ? "Creating…" : "Enter Veil")
                             Spacer()
                             Image(systemName: "arrow.up.right")
                         }
@@ -147,9 +175,20 @@ struct AccountSetupView: View {
                     }
                     .background(appearance.accentColor, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                     .foregroundStyle(Color.veilBackground)
-                    .disabled(!canContinue)
+                    .disabled(!canContinue || appFlow.isWorking)
 
-                    Text("Local demo only. No account or secret is sent anywhere.")
+                    if let error = appFlow.errorMessage {
+                        Text(error)
+                            .font(.callout)
+                            .foregroundStyle(.red)
+                            .padding(12)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+                    }
+
+                    Text(usesLocalServer
+                         ? "Connects to \(APIClient.configuredBaseURL.absoluteString). Change the address in Settings after setup."
+                         : "Demo mode stays entirely on this device.")
                         .font(.caption)
                         .foregroundStyle(Color.veilSecondary)
                 }
@@ -162,6 +201,95 @@ struct AccountSetupView: View {
             .sheet(isPresented: $showsDetails) {
                 RecoveryExplanationView()
                     .presentationDetents([.medium, .large])
+            }
+            .sheet(isPresented: $showsRecovery) {
+                RecoveryAccountView()
+            }
+        }
+    }
+}
+
+struct RecoveryCodeView: View {
+    @EnvironmentObject private var appFlow: AppFlowStore
+    @EnvironmentObject private var appearance: AppearanceStore
+    let recoveryCode: String
+    @State private var hasConfirmedStorage = false
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 24) {
+                VeilSectionLabel(text: "Shown once")
+                Text("Save your recovery code.")
+                    .font(.system(size: 40, weight: .medium))
+                    .tracking(-1.4)
+                Text("You need this code and your security passphrase to recover the account. Keep them in separate places.")
+                    .foregroundStyle(Color.veilSecondary)
+                Text(recoveryCode)
+                    .font(.system(.body, design: .monospaced).weight(.semibold))
+                    .textSelection(.enabled)
+                    .padding(18)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.veilRaised, in: RoundedRectangle(cornerRadius: 14))
+                    .overlay { RoundedRectangle(cornerRadius: 14).stroke(appearance.accentColor.opacity(0.5)) }
+                ShareLink(item: recoveryCode) {
+                    Label("Export securely", systemImage: "square.and.arrow.up")
+                }
+                Toggle("I saved it somewhere separate", isOn: $hasConfirmedStorage)
+                Button("Continue") { appFlow.clearRecoveryCodeFromScreen() }
+                    .buttonStyle(.borderedProminent)
+                    .tint(appearance.accentColor)
+                    .disabled(!hasConfirmedStorage)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                Spacer()
+            }
+            .padding(24)
+            .background(Color.veilBackground.ignoresSafeArea())
+            .navigationTitle("Recovery")
+        }
+    }
+}
+
+struct RecoveryAccountView: View {
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var appFlow: AppFlowStore
+    @State private var username = ""
+    @State private var passphrase = ""
+    @State private var recoveryCode = ""
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Account") {
+                    TextField("Username", text: $username)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                    SecureField("Security passphrase", text: $passphrase)
+                    TextField("Recovery code", text: $recoveryCode, axis: .vertical)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                }
+                Section {
+                    Text("Recovery revokes old Veil and Matrix sessions. Old encrypted history still needs a transfer from an existing device.")
+                        .font(.caption)
+                        .foregroundStyle(Color.veilSecondary)
+                }
+                if let error = appFlow.errorMessage {
+                    Section { Text(error).foregroundStyle(.red) }
+                }
+            }
+            .navigationTitle("Recover account")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(appFlow.isWorking ? "Recovering…" : "Recover") {
+                        Task {
+                            if await appFlow.recoverAccount(username: username, passphrase: passphrase, recoveryCode: recoveryCode) {
+                                dismiss()
+                            }
+                        }
+                    }
+                    .disabled(username.isEmpty || passphrase.count < 12 || recoveryCode.isEmpty || appFlow.isWorking)
+                }
             }
         }
     }

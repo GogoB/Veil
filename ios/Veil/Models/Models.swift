@@ -138,10 +138,11 @@ struct Topic: Identifiable, Hashable {
 enum PostMedia: Identifiable, Equatable {
     case architecture(UUID)
     case image(id: UUID, data: Data)
+    case remote(id: UUID, url: URL)
 
     var id: UUID {
         switch self {
-        case let .architecture(id), let .image(id, _): return id
+        case let .architecture(id), let .image(id, _), let .remote(id, _): return id
         }
     }
 }
@@ -160,6 +161,11 @@ struct DemoPost: Identifiable, Equatable {
     let isMine: Bool
     let eligibleForFollowing: Bool
     let media: [PostMedia]
+    var isEdited = false
+    var referenceLabel: String? = nil
+    var collaboratorHandles: [String] = []
+    var actorProfileID: UUID? = nil
+    var actorEnforcementToken: String? = nil
 }
 
 struct DemoComment: Identifiable, Equatable {
@@ -167,6 +173,13 @@ struct DemoComment: Identifiable, Equatable {
     let actor: ActorPresentation
     let body: String
     let createdLabel: String
+    var parentID: UUID? = nil
+    var rootID: UUID? = nil
+    var isDeleted = false
+    var isEdited = false
+    var likeCount = 0
+    var isLiked = false
+    var isMine = false
 }
 
 struct DemoConversation: Identifiable {
@@ -175,6 +188,7 @@ struct DemoConversation: Identifiable {
     let preview: String
     let time: String
     let isRequest: Bool
+    var isAccepted: Bool = true
 }
 
 enum ComposerValidationError: LocalizedError {

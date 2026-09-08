@@ -24,6 +24,11 @@
     <true/>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Choose images to attach to a post. Veil re-encodes selected images before upload.</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
     <key>UIApplicationSceneManifest</key>
     <dict>
         <key>UIApplicationSupportsMultipleScenes</key>

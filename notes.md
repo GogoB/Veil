@@ -1,7 +1,7 @@
 # Veil - Project Notes
 
 Working name: **Veil**. Final product name and branding remain open.
-Status: product planning and native SwiftUI demo shell; backend not started.
+Status: local native SwiftUI/Vapor/PostgreSQL/Synapse proof of concept implemented; Mac build and Figma application pending.
 Started: 2026-09-05.
 
 This file is the continuing project record. Update it after meaningful discussions
@@ -199,9 +199,31 @@ uses demo data and covers onboarding, account-mode choice, feeds, topics, post
 detail and replies, the full identity composer, image sanitization, search,
 messages, profiles, Veiled Activity, and privacy/appearance settings.
 
-Static project validation is available on Windows, but SwiftUI compilation and
-rendering require Apple's SDK on the Mac. Backend, real authentication/recovery,
-Matrix encryption, upload transport, and expiration jobs remain outstanding.
+At that milestone, static project validation was available on Windows while the
+backend and live integration were still outstanding. SwiftUI compilation and
+rendering continue to require Apple's SDK on the Mac.
+
+### Full local proof-of-concept milestone — 2026-09-08
+
+The repository now includes the Shared Codable contract package, privacy tests,
+Vapor/Fluent API, PostgreSQL migrations, local media sanitization, restricted
+ownership mappings, Docker Compose, and a federation-disabled Synapse service.
+The SwiftUI application supports live local-server accounts while retaining demo
+mode, and the Matrix Rust Swift package is pinned to 26.08.11 behind the messaging
+adapter. Account recovery, live profiles, feeds, posts, sanitized media, comment
+controls, likes, search, reports, collaboration invitations, encrypted text and
+image messages, message requests, selected-message reporting, and old-device
+message-key transfer are wired into the native app.
+
+On Windows, Shared tests (7), Server tests (4), the iOS source/project verifier,
+Swift syntax parsing, Compose health checks, and a multi-account API smoke test
+passed. The expanded smoke test covers recovery rotation/session revocation,
+profile updates and counts, public and anonymous feeds, privacy serialization,
+libvips media sanitization, collaboration acceptance and departure, repost and
+quote deletion behavior, comment ownership/identity/likes/edit/delete behavior,
+encrypted Matrix room provisioning, blocking, every anonymous request policy,
+acceptance, and conversation timers. Xcode compilation and Apple UI/accessibility
+checks remain Mac-only. Figma screens have not been supplied.
 
 ## Workspace and artwork
 

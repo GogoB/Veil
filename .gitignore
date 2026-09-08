@@ -27,3 +27,7 @@ desktop.ini
 
 # Temporary local verification files
 .tmp/
+.local/
+
+# Compiler logs copied from the Linux builder
+.build-linux.log

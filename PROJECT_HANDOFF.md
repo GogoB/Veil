@@ -1,7 +1,7 @@
 # Veil — Complete Project Handoff
 
-Updated: 2026-09-07  
-Status: product and technical planning are complete; native SwiftUI implementation has started with a demo-data application shell; backend implementation has not started.
+Updated: 2026-09-08
+Status: the local proof of concept is implemented across native SwiftUI, Shared contracts, Vapor/PostgreSQL, and private Synapse; Mac/Xcode validation and Figma application remain.
 
 Repository: C:\Users\GorjanB\Gorjan\Desktop\Veil  
 Branch: main  
@@ -298,11 +298,12 @@ implementation and design work; Extra High, where available, for privacy
 boundaries, recovery, encrypted messaging, and difficult cross-system debugging.
 Medium is sufficient for small, well-specified visual and copy adjustments.
 
-### Native SwiftUI milestone (2026-09-07)
+### Native SwiftUI and local-stack milestone (2026-09-07)
 
 The first attempt incorrectly produced a browser prototype. The user corrected
 the scope to SwiftUI. That prototype was removed and replaced with the native
-project at `ios/Veil.xcodeproj`.
+project at `ios/Veil.xcodeproj`. The local Vapor/PostgreSQL/Synapse stack and live
+iOS integration are now implemented as well.
 
 The SwiftUI application currently includes:
 
@@ -311,20 +312,33 @@ The SwiftUI application currently includes:
   post detail.
 - An attributed/anonymous composer with generated/custom/sigil-only presentation,
   topic, expiration, sensitive-content, and up to four PhotosPicker images.
-- Local image pixel checks and re-encoding before a future upload transport.
+- Local image pixel checks and re-encoding before upload; the live API then
+  validates decoded dimensions, strips metadata, and re-encodes with libvips.
 - Public search that excludes anonymous aliases and sigils.
 - Veiled Activity and public-profile separation.
-- Demo message requests/conversations behind a MessagingProvider protocol.
+- Demo and live encrypted message requests/conversations behind a MessagingProvider protocol.
 - Privacy controls plus dark/light/system and acid/cyan appearance choices.
+- Live account creation/recovery, feeds, search, public profile editing and
+  following, posts, image upload, comment editing/deletion/likes, reports,
+  collaborator invitations, and Veiled Activity.
+- Matrix room provisioning, encrypted timelines, selected-message reporting,
+  SDK-managed encrypted image attachments, delete-for-all, disappearing-message
+  metadata, blocking, and old-device key transfer.
 
-The app targets iOS 16 and uses demo data without a backend. Open
-`ios/Veil.xcodeproj` on the Mac in Xcode 15 or later. Windows does not have the
-Apple SDK, so compilation, simulator rendering, Dynamic Type, and VoiceOver still
-require the Mac. This milestone does not prove production privacy, authentication,
-encryption, upload, or expiration behavior.
+The app targets iOS 16 and retains an offline demo mode. Open
+`ios/Veil.xcodeproj` on the Mac in Xcode. Windows does not have the Apple SDK, so
+compilation, simulator rendering, Dynamic Type, and VoiceOver still require the
+Mac. The local stack and API flows are verified; this remains a proof of concept,
+not a production privacy or security audit.
 
 On Windows, run `powershell -NoProfile -File scripts/Verify-iOSProject.ps1` to
 check Xcode source membership, Info.plist XML, and the local privacy-model guard.
+
+Verified on 2026-09-08: the production server image compiled, PostgreSQL, Synapse,
+and Vapor were healthy, and the expanded multi-account smoke test passed. It covers
+recovery/session rotation, live profiles, sanitized media, feeds, collaborations,
+reposts and quotes, comment ownership/identity/likes/edit/delete behavior, Matrix
+rooms, blocking, and all anonymous message-request policies.
 
 ### Repository areas
 

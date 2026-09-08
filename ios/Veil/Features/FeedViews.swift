@@ -16,6 +16,13 @@ struct FeedView: View {
             ScrollView {
                 LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
                     Section {
+                        if let error = store.backendError {
+                            Label(error, systemImage: "exclamationmark.triangle")
+                                .font(.caption)
+                                .foregroundStyle(Color.red)
+                                .padding(.horizontal, 20)
+                                .padding(.top, 12)
+                        }
                         topicStrip
                         if posts.isEmpty {
                             VStack(spacing: 14) {
@@ -41,7 +48,12 @@ struct FeedView: View {
                     }
                 }
             }
+            .refreshable { await store.refresh(feed: feedKind) }
             .background(Color.veilBackground)
+            .task { await store.refresh(feed: feedKind) }
+            .onChange(of: feedKind) { newValue in
+                Task { await store.refresh(feed: newValue) }
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) { VeilWordmark() }
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -127,6 +139,12 @@ struct PostDetailView: View {
     let postID: UUID
     @EnvironmentObject private var store: DemoSocialStore
     @State private var reply = ""
+    @State private var replyIdentity: PostIdentityChoice = .anonymous
+    @State private var replyParentID: UUID?
+    @State private var hasCommented = false
+    @State private var editingComment: DemoComment?
+    @State private var editingBody = ""
+    @State private var commentPendingDeletion: DemoComment?
 
     private var post: DemoPost? { store.posts.first(where: { $0.id == postID }) }
 
@@ -146,41 +164,154 @@ struct PostDetailView: View {
                                     }
                                     Text(comment.createdLabel).font(.caption).foregroundStyle(Color.veilSecondary)
                                 }
-                                Text(comment.body).font(.body).lineSpacing(3)
+                                Text(comment.body)
+                                    .font(.body)
+                                    .lineSpacing(3)
+                                    .foregroundStyle(comment.isDeleted ? Color.veilSecondary : Color.primary)
+                                HStack(spacing: 14) {
+                                    if comment.isEdited {
+                                        Text("EDITED").font(.veilLabel(size: 8))
+                                    }
+                                    if !comment.isDeleted {
+                                        Button("Reply") {
+                                            replyParentID = comment.rootID ?? comment.id
+                                        }
+                                        .font(.caption)
+                                        Button {
+                                            store.toggleCommentLike(comment.id, in: postID)
+                                        } label: {
+                                            Label("\(comment.likeCount)", systemImage: comment.isLiked ? "heart.fill" : "heart")
+                                        }
+                                        .font(.caption)
+                                        .foregroundStyle(comment.isLiked ? Color.accentColor : Color.veilSecondary)
+                                    }
+                                }
                             }
                             Spacer(minLength: 0)
                         }
                         .padding(20)
+                        .padding(.leading, comment.parentID == nil ? 0 : 28)
+                        .contextMenu {
+                            if comment.isMine && !comment.isDeleted {
+                                Button {
+                                    editingBody = comment.body
+                                    editingComment = comment
+                                } label: {
+                                    Label("Edit comment", systemImage: "pencil")
+                                }
+                                Button(role: .destructive) {
+                                    commentPendingDeletion = comment
+                                } label: {
+                                    Label("Delete comment", systemImage: "trash")
+                                }
+                            }
+                        }
                         VeilDivider()
                     }
                 }
             }
         }
         .background(Color.veilBackground)
+        .task {
+            await store.loadComments(for: postID)
+            if let ownComment = store.comments(for: postID).first(where: \.isMine) {
+                hasCommented = true
+                replyIdentity = ownComment.actor.isAnonymous ? .anonymous : .profile
+            }
+        }
         .navigationTitle("Conversation")
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
-            HStack(spacing: 10) {
-                TextField("Add a thought…", text: $reply, axis: .vertical)
-                    .lineLimit(1...4)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 11)
-                    .background(Color.veilRaised, in: RoundedRectangle(cornerRadius: 12))
-                Button {
-                    store.addComment(reply, to: postID)
-                    reply = ""
-                } label: {
-                    Image(systemName: "arrow.up.right")
-                        .frame(width: 44, height: 44)
-                        .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 12))
-                        .foregroundStyle(Color.veilBackground)
+            VStack(alignment: .leading, spacing: 6) {
+                if replyParentID != nil {
+                    HStack {
+                        Text("Replying in thread").font(.caption).foregroundStyle(Color.veilSecondary)
+                        Spacer()
+                        Button("Cancel") { replyParentID = nil }.font(.caption)
+                    }
                 }
-                .disabled(reply.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .accessibilityLabel("Post reply")
+                HStack(spacing: 10) {
+                    Menu {
+                        Button("Anonymous") { replyIdentity = .anonymous }
+                        Button("Public profile") { replyIdentity = .profile }
+                    } label: {
+                        Image(systemName: replyIdentity == .anonymous ? "hexagon" : "person.crop.circle")
+                            .frame(width: 36, height: 44)
+                    }
+                    .disabled(hasCommented)
+                    .accessibilityLabel("Reply as \(replyIdentity.title)")
+                    TextField("Add a thought…", text: $reply, axis: .vertical)
+                        .lineLimit(1...4)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 11)
+                        .background(Color.veilRaised, in: RoundedRectangle(cornerRadius: 12))
+                    Button {
+                        store.addComment(reply, to: postID, parentID: replyParentID, identity: replyIdentity)
+                        reply = ""
+                        replyParentID = nil
+                        hasCommented = true
+                    } label: {
+                        Image(systemName: "arrow.up.right")
+                            .frame(width: 44, height: 44)
+                            .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 12))
+                            .foregroundStyle(Color.veilBackground)
+                    }
+                    .disabled(reply.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .accessibilityLabel("Post reply")
+                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
             .background(.ultraThinMaterial)
+        }
+        .sheet(item: $editingComment) { comment in
+            CommentEditSheet(text: $editingBody) {
+                Task { await store.editComment(comment.id, in: postID, body: editingBody) }
+            }
+        }
+        .confirmationDialog(
+            "Delete this comment?",
+            isPresented: Binding(
+                get: { commentPendingDeletion != nil },
+                set: { if !$0 { commentPendingDeletion = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                guard let comment = commentPendingDeletion else { return }
+                Task { await store.deleteComment(comment.id, in: postID) }
+                commentPendingDeletion = nil
+            }
+            Button("Cancel", role: .cancel) { commentPendingDeletion = nil }
+        } message: {
+            Text("Comments with replies become a tombstone so the thread still makes sense.")
+        }
+    }
+}
+
+private struct CommentEditSheet: View {
+    @Binding var text: String
+    let save: () -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            TextEditor(text: $text)
+                .padding()
+                .scrollContentBackground(.hidden)
+                .background(Color.veilBackground)
+                .navigationTitle("Edit comment")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Save") {
+                            save()
+                            dismiss()
+                        }
+                        .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || text.count > 2_000)
+                    }
+                }
         }
     }
 }
