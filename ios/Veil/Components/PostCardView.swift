@@ -113,10 +113,45 @@ struct PostCardView: View {
                         .foregroundStyle(Color.veilSecondary)
                 }
 
-                if let referenceLabel = post.referenceLabel {
-                    Label(referenceLabel, systemImage: "arrow.2.squarepath")
+                if let reference = post.reference {
+                    Label(
+                        reference.label,
+                        systemImage: reference.label == "Quote" ? "quote.bubble" : "arrow.2.squarepath"
+                    )
                         .font(.caption.weight(.medium))
-                        .foregroundStyle(referenceLabel == "Original unavailable" ? Color.orange : Color.veilSecondary)
+                        .foregroundStyle(reference.originalUnavailable ? Color.orange : Color.veilSecondary)
+
+                    if !reference.originalUnavailable, let actor = reference.actor {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(spacing: 10) {
+                                ActorBadge(actor: actor, size: 36)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(actor.displayName ?? "Anonymous")
+                                        .font(.subheadline.weight(.semibold))
+                                    Text([actor.subtitle, reference.createdLabel].compactMap { $0 }.joined(separator: " · "))
+                                        .font(.caption)
+                                        .foregroundStyle(Color.veilSecondary)
+                                }
+                            }
+
+                            if let body = reference.body, !body.isEmpty {
+                                Text(body)
+                                    .font(.body)
+                                    .lineSpacing(2)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+
+                            ForEach(reference.media) { media in
+                                mediaView(media, sensitiveOverride: reference.isSensitive)
+                            }
+                        }
+                        .padding(14)
+                        .background(Color.veilRaised, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(Color.veilLine, lineWidth: 1)
+                        }
+                    }
                 }
 
                 if !post.collaboratorHandles.isEmpty {
@@ -160,7 +195,7 @@ struct PostCardView: View {
 
                     Spacer(minLength: 0)
 
-                    ShareLink(item: post.body) {
+                    ShareLink(item: post.body.isEmpty ? (post.reference?.body ?? "") : post.body) {
                         Image(systemName: "arrow.up.right")
                             .frame(width: 44, height: 44)
                     }
@@ -231,7 +266,8 @@ struct PostCardView: View {
     }
 
     @ViewBuilder
-    private func mediaView(_ media: PostMedia) -> some View {
+    private func mediaView(_ media: PostMedia, sensitiveOverride: Bool? = nil) -> some View {
+        let isSensitive = sensitiveOverride ?? post.isSensitive
         ZStack {
             Group {
                 switch media {
@@ -261,11 +297,11 @@ struct PostCardView: View {
             .frame(height: 210)
             .frame(maxWidth: .infinity)
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .blur(radius: post.isSensitive && !revealsSensitiveMedia ? 18 : 0)
-            .scaleEffect(post.isSensitive && !revealsSensitiveMedia ? 1.08 : 1)
+            .blur(radius: isSensitive && !revealsSensitiveMedia ? 18 : 0)
+            .scaleEffect(isSensitive && !revealsSensitiveMedia ? 1.08 : 1)
             .clipped()
 
-            if post.isSensitive && !revealsSensitiveMedia {
+            if isSensitive && !revealsSensitiveMedia {
                 Button("Sensitive content · Show") {
                     withAnimation { revealsSensitiveMedia = true }
                 }

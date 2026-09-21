@@ -147,6 +147,16 @@ enum PostMedia: Identifiable, Equatable {
     }
 }
 
+struct DemoPostReference: Equatable {
+    let label: String
+    let actor: ActorPresentation?
+    let body: String?
+    let createdLabel: String?
+    let media: [PostMedia]
+    let isSensitive: Bool
+    let originalUnavailable: Bool
+}
+
 struct DemoPost: Identifiable, Equatable {
     let id: UUID
     var actor: ActorPresentation
@@ -162,7 +172,7 @@ struct DemoPost: Identifiable, Equatable {
     let eligibleForFollowing: Bool
     let media: [PostMedia]
     var isEdited = false
-    var referenceLabel: String? = nil
+    var reference: DemoPostReference? = nil
     var collaboratorHandles: [String] = []
     var actorProfileID: UUID? = nil
     var actorEnforcementToken: String? = nil

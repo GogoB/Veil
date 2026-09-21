@@ -84,15 +84,7 @@ struct PublicPresenter: Sendable {
             enforcementToken: record.enforcementToken,
             database: request.db
         )
-        let medias = try await record.mediaIDs.asyncCompactMap { mediaID -> Media? in
-            guard let media = try await MediaRecord.find(mediaID, on: request.db), let id = media.id else { return nil }
-            return Media(
-                id: id,
-                url: URL(string: "/uploads/\(media.objectName)")!,
-                width: media.width,
-                height: media.height
-            )
-        }
+        let medias = try await self.media(for: record, database: request.db)
         let reference = try await self.reference(for: record, viewer: viewer, request: request)
         let liked = if let viewer {
             try await LikeRecord.query(on: request.db)
@@ -192,6 +184,7 @@ struct PublicPresenter: Sendable {
             enforcementToken: original.enforcementToken,
             database: request.db
         )
+        let media = try await self.media(for: original, database: request.db)
         return PostReference(
             kind: kind,
             postID: referencedID,
@@ -200,10 +193,24 @@ struct PublicPresenter: Sendable {
                 actor: actor,
                 visibility: PostVisibility(rawValue: original.visibility) ?? .anonymous,
                 body: original.body,
+                media: media,
+                isSensitive: original.isSensitive,
                 createdAt: createdAt
             ),
             originalUnavailable: false
         )
+    }
+
+    private func media(for record: PostRecord, database: any Database) async throws -> [Media] {
+        try await record.mediaIDs.asyncCompactMap { mediaID -> Media? in
+            guard let media = try await MediaRecord.find(mediaID, on: database), let id = media.id else { return nil }
+            return Media(
+                id: id,
+                url: URL(string: "/uploads/\(media.objectName)")!,
+                width: media.width,
+                height: media.height
+            )
+        }
     }
 }
 

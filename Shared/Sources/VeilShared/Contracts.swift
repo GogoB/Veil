@@ -213,6 +213,7 @@ public struct ReferencedPost: Codable, Identifiable, Equatable, Sendable {
     public let visibility: PostVisibility
     public let body: String
     public let media: [Media]
+    public let isSensitive: Bool
     public let createdAt: Date
 
     public init(
@@ -221,6 +222,7 @@ public struct ReferencedPost: Codable, Identifiable, Equatable, Sendable {
         visibility: PostVisibility,
         body: String,
         media: [Media] = [],
+        isSensitive: Bool = false,
         createdAt: Date
     ) {
         self.id = id
@@ -228,6 +230,7 @@ public struct ReferencedPost: Codable, Identifiable, Equatable, Sendable {
         self.visibility = visibility
         self.body = body
         self.media = media
+        self.isSensitive = isSensitive
         self.createdAt = createdAt
     }
 }

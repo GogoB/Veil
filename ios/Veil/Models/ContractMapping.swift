@@ -24,7 +24,22 @@ extension VeilShared.Topic {
 
 extension VeilShared.Post {
     func localPost(apiBaseURL: URL) -> DemoPost {
-        DemoPost(
+        let localReference = reference.map { reference in
+            let original = reference.original
+            return DemoPostReference(
+                label: reference.originalUnavailable ? "Original unavailable" : reference.kind.rawValue.capitalized,
+                actor: original?.actor.localPresentation,
+                body: original?.body,
+                createdLabel: original?.createdAt.relativeLabel,
+                media: original?.media.map { item in
+                    let resolved = URL(string: item.url.absoluteString, relativeTo: apiBaseURL)?.absoluteURL ?? item.url
+                    return .remote(id: item.id, url: resolved)
+                } ?? [],
+                isSensitive: original?.isSensitive ?? false,
+                originalUnavailable: reference.originalUnavailable
+            )
+        }
+        return DemoPost(
             id: id,
             actor: actor.localPresentation,
             body: body,
@@ -42,7 +57,7 @@ extension VeilShared.Post {
                 return .remote(id: item.id, url: resolved)
             },
             isEdited: editedAt != nil,
-            referenceLabel: reference.map { $0.originalUnavailable ? "Original unavailable" : $0.kind.rawValue.capitalized },
+            reference: localReference,
             collaboratorHandles: acceptedCollaborators?.map(\.username) ?? [],
             actorProfileID: actor.profile?.id,
             actorEnforcementToken: actor.enforcementToken

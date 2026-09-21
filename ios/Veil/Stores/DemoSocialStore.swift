@@ -163,6 +163,13 @@ final class DemoSocialStore: ObservableObject {
         }
     }
 
+    private var localProfileHandle: String {
+        for post in posts where post.isMine && !post.actor.isAnonymous {
+            if case let .profile(handle, _) = post.actor, !handle.isEmpty { return handle }
+        }
+        return "you"
+    }
+
     func search(_ query: String) -> [DemoPost] {
         let needle = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard !needle.isEmpty else { return [] }
@@ -422,6 +429,33 @@ final class DemoSocialStore: ObservableObject {
             actor = .anonymous(alias: alias, sigilSeed: sigilSeed, role: .originalPoster)
         }
 
+        let localReference: DemoPostReference?
+        if let referenceKind, let referencedPostID {
+            if let original = posts.first(where: { $0.id == referencedPostID }) {
+                localReference = DemoPostReference(
+                    label: referenceKind.rawValue.capitalized,
+                    actor: original.actor,
+                    body: original.body,
+                    createdLabel: original.createdLabel,
+                    media: original.media,
+                    isSensitive: original.isSensitive,
+                    originalUnavailable: false
+                )
+            } else {
+                localReference = DemoPostReference(
+                    label: "Original unavailable",
+                    actor: nil,
+                    body: nil,
+                    createdLabel: nil,
+                    media: [],
+                    isSensitive: false,
+                    originalUnavailable: true
+                )
+            }
+        } else {
+            localReference = nil
+        }
+
         let id = UUID()
         let post = DemoPost(
             id: id,
@@ -436,7 +470,8 @@ final class DemoSocialStore: ObservableObject {
             isSensitive: isSensitive,
             isMine: true,
             eligibleForFollowing: identity == .profile,
-            media: images.map { .image(id: UUID(), data: $0) }
+            media: images.map { .image(id: UUID(), data: $0) },
+            reference: localReference
         )
         posts.insert(post, at: 0)
         return id
@@ -493,7 +528,7 @@ final class DemoSocialStore: ObservableObject {
                 generatedAlias: "",
                 customAlias: "",
                 sigilSeed: 0,
-                profileHandle: "",
+                profileHandle: localProfileHandle,
                 topic: nil,
                 expiration: .never,
                 isSensitive: false,
